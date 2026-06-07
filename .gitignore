@@ -31,3 +31,17 @@ build/
 
 ### VS Code ###
 .vscode/
+# H2 Database
+*.mv.db
+*.trace.db
+*.lock.db
+
+# Mac
+.DS_Store
+
+# Build
+target/
+
+# IDE
+.idea/
+.vscode/
