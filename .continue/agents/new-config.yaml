@@ -1,0 +1,20 @@
+name: Local Config
+version: 1.0.0
+schema: v1
+
+models:
+  - name: Llama 3 8B
+    provider: ollama
+    model: llama3
+    apiBase: http://127.0.0.1:11434
+
+    defaultCompletionOptions:
+      temperature: 0.2
+      topP: 0.9
+      maxTokens: 2048
+      contextLength: 8192
+
+    capabilities:
+      - chat
+      - edit
+      - autocomplete
