@@ -8,18 +8,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest(properties = {
-        "spring.datasource.url=jdbc:h2:mem:gymlog-test;DB_CLOSE_DELAY=-1",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
-})
+@SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Transactional // <-- This automatically rolls back DB changes after each test!
 class DataInitializerIntegrationTest {
 
     @Autowired
@@ -48,6 +47,7 @@ class DataInitializerIntegrationTest {
 
     @Test
     void logWorkoutWithCalories_shouldPersistCaloriesForGraph() throws Exception {
+        // 1. Log a new workout
         mockMvc.perform(post("/api/workouts/log")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -63,6 +63,7 @@ class DataInitializerIntegrationTest {
                 .andExpect(jsonPath("$.estimatedCalories", is(37.78)))
                 .andExpect(jsonPath("$.durationMinutes", is(5.67)));
 
+        // 2. Verify it shows up in the graph
         mockMvc.perform(get("/api/workouts/graph"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.exercises.length()", is(2)))
